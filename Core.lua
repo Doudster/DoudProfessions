@@ -6,7 +6,7 @@
 -- Settings (ProfessionsDB, account-wide): chars["Name-Realm"] = { class, profs = { {name, rank, max} }, profsAt,
 -- money = { ["YYYY-MM-DD"] = copper (last seen that day) } }, sales = { {t, char, kind, item, count, money} },
 -- vendor = { {t, char, kind = buy/buyback/repair, item (link), count, cost, vendor, note} } (Vendor tab),
--- fav[recipeID] / hidden[recipeID] = true (Recipes tab), mine = true (Recipes tab "My professions" filter on), dimUnknown = true (Recipes tab "Dim unknown": rows of recipes nobody knows at alpha 0.45), scanned[recipeID] = recipe read from an open trade skill (Data.lua format), pos = window position,
+-- fav[recipeID] / hidden[recipeID] = true (Recipes tab), mine = true (Recipes tab "My professions" filter on), hideUnknown = true (Recipes tab "Hide unknown": recipes nobody knows left out), scanned[recipeID] = recipe read from an open trade skill (Data.lua format), pos = window position,
 -- deIgnore[itemID] = true / deBound / deAuto / deObs["quality:ilvl/5"] = { n, [itemID] = times } (Disenchant tab).
 local _, FT = ...
 FT.Module("Professions", function(...)

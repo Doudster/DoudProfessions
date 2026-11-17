@@ -344,7 +344,6 @@ table.insert(ns.tabs, { name = "Recipes", build = function(page)
         item = function(rec) return not rec.kind and rec.r and rec.r[3] end,
         pin = function(rec) return rec.kind == "hdr" and 0 or rec.kind == "mat" and 1 or ns.db.fav[rec.id] and 2 end,
         selected = function(rec) return rec.id == sel end,
-        dim = function(rec) return ns.db.dimUnknown and not rec.kind and Unknown(rec.id, rec.r[1]) end,
         expand = function(rec) return rec.id == sel and P or nil end,
         click = function(rec, btn, col)
             if rec.kind == "hdr" then rawOpen = not rawOpen; Refresh() return end
@@ -543,7 +542,8 @@ table.insert(ns.tabs, { name = "Recipes", build = function(page)
         local list, q, rk = {}, search:lower(), MyRanks()
         for id, r in pairs(ns.AllRecipes()) do
             if (next(skills) == nil or skills[r[1]]) and (q == "" or r[2]:lower():find(q, 1, true))
-                and (showHidden or not ns.db.hidden[id] or justHidden[id]) and (not favOnly or ns.db.fav[id]) then
+                and (showHidden or not ns.db.hidden[id] or justHidden[id]) and (not favOnly or ns.db.fav[id])
+                and not (ns.db.hideUnknown and Unknown(id, r[1])) then
                 local cost, sell, margin, pct = ns.Calc(r)
                 if not vendorOnly or (VSell({ r = r }) or 0) > (cost or math.huge) then list[#list + 1] = { id = id, r = r, cost = cost, sell = sell, margin = margin, pct = pct, diff = Diff(rk[r[1]], ns.SkillUp[id]) } end
             end
@@ -679,10 +679,10 @@ table.insert(ns.tabs, { name = "Recipes", build = function(page)
     vbl:SetPoint("LEFT", vb, "RIGHT", 0, 1); vbl:SetText("Vendor profit only")
     page.vendorBox = vb
     local db = CreateFrame("CheckButton", nil, page, "UICheckButtonTemplate")
-    db:SetSize(24, 24); db:SetPoint("LEFT", vbl, "RIGHT", 12, -1); db:SetChecked(ns.db.dimUnknown and true or false)
-    db:SetScript("OnClick", function(self) ns.db.dimUnknown = self:GetChecked() and true or nil; page.table:Redraw() end)
+    db:SetSize(24, 24); db:SetPoint("LEFT", vbl, "RIGHT", 12, -1); db:SetChecked(ns.db.hideUnknown and true or false)
+    db:SetScript("OnClick", function(self) ns.db.hideUnknown = self:GetChecked() and true or nil; Refresh() end)
     local dbl = page:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-    dbl:SetPoint("LEFT", db, "RIGHT", 0, 1); dbl:SetText("Dim unknown")
+    dbl:SetPoint("LEFT", db, "RIGHT", 0, 1); dbl:SetText("Hide unknown")
     page.dimBox = db
     page.count = page:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
     page.count:SetPoint("RIGHT", page, "TOPRIGHT", -10, -52)
