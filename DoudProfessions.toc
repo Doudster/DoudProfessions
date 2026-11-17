@@ -1,0 +1,14 @@
+## Interface: 16001
+## Title: |cffffd100Doud's Professions|r
+## Notes: Doud's UI Professions module on its own (private, not published): recipe costs and margins, alts, gold, sales, disenchant, vendor, flip. /dprof
+## Author: Doudster
+## Version: dev
+## X-License: All Rights Reserved
+## OptionalDeps: Auctionator
+## SavedVariables: ProfessionsDB
+## AddonCompartmentFunc: DoudProfessions_Toggle
+# ProfessionsDB is the same global Doud's UI's Professions module saves: data carries over
+# (with both installed, Doud's UI skips its own Professions module).
+
+Shim.lua
+Professions.xml

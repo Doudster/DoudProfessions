@@ -1,0 +1,14 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <Script file="Core.lua"/>
+    <Script file="Data.lua"/>
+    <Script file="Recipes.lua"/>
+    <Script file="Alts.lua"/>
+    <Script file="Wealth.lua"/>
+    <Script file="Sales.lua"/>
+    <Script file="Stats.lua"/>
+    <Script file="Disenchant.lua"/>
+    <Script file="CraftInfo.lua"/>
+    <Script file="Vendor.lua"/>
+    <Script file="Flip.lua"/>
+    <Script file="Arbitrage.lua"/>
+</Ui>
