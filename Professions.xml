@@ -11,4 +11,5 @@
     <Script file="Vendor.lua"/>
     <Script file="Flip.lua"/>
     <Script file="Arbitrage.lua"/>
+    <Script file="Crates.lua"/>
 </Ui>

@@ -1,5 +1,5 @@
--- Professions: a "Professions" tab on Blizzard's profession window (Blizzard_Professions, lazy-loaded)
--- opens a wide window (the full journal's size) with its own tabs, one file each: Recipes, Alts, Wealth, Sales, Item stats, Disenchant, Vendor, Flip.
+-- Professions: a "Professions" tab on Blizzard's profession window (Blizzard_Professions, lazy-loaded) + a minimap button
+-- opens a wide window (the full journal's size) with its own tabs, one file each: Recipes, Alts, Wealth, Sales, Item stats, Disenchant, Vendor, Flip, Arbitrage, Crates.
 -- Right-click a row of Alts / Wealth / Sales / Item stats / Vendor: delete it (asks first).
 -- Tab files add { name, build = fn(page), shown = fn() (optional: false hides the tab) } to ns.tabs and listen through ns.On;
 -- page.Refresh (if set) runs on show.
@@ -91,7 +91,7 @@ end
 -- (18px textures before the text), tag = fn(rec) -> string|nil (a small grey right-aligned label in the cell; the text is
 -- shortened to clear it), tagTip = fn(rec) (with tag: hovering the tag fills GameTooltip; the tag's hover region ignores clicks, so
 -- they still reach the row) } }. t:SetRows(recs) redraws; a header click sorts by that column, a second
--- click reverses. tip(rec) (optional) fills GameTooltip while hovering the text of a column marked nameTip (not the rest of the row). opts (optional): click(rec, button, colIndex)
+-- click reverses. tip(rec) (optional) fills GameTooltip while hovering the text of a column marked nameTip (not the rest of the row). opts (optional): rowTip(rec) fills GameTooltip (at the cursor) while hovering anywhere on the row, click(rec, button, colIndex)
 -- on row click, item(rec) -> itemID (Shift+left click searches it on an open AH, via Auctionator), pin(rec) -> number (lower sorts first, true = 1, nil/false = last) whatever the sort column, selected(rec) -> true highlights the
 -- row, dim(rec) -> true draws the row at alpha 0.45; expand(rec) -> frame or nil: that frame (sized by the caller) is shown right under the row, pushing the following
 -- rows down (rows that no longer fit are hidden; the frame is hidden when its row isn't shown); t.Redraw() repaints without re-sorting; t.colX[k] = column k's left x in the table, t.width = its width (scrollbar included).
@@ -279,6 +279,12 @@ function ns.Table(parent, cols, nRows, tip, sortCol, desc, opts)
                 end
                 opts.click(self.rec, btn, col)
             end)
+        end
+        if opts.rowTip then    -- whole-row tooltip (hover regions of tag/nameTip columns keep their own)
+            r:SetScript("OnEnter", function(self)
+                if self.rec then GameTooltip:SetOwner(self, "ANCHOR_CURSOR"); opts.rowTip(self.rec); GameTooltip:Show() end
+            end)
+            r:SetScript("OnLeave", function() GameTooltip:Hide() end)
         end
         rows[i] = r
     end
@@ -556,9 +562,45 @@ function ns.Panel(page)
     fs:SetText("Also a tab on the profession window. Prices: Auctionator.")
 end
 
+-- minimap button (named *Button* child of Minimap, so MinimapTweaks' button collector picks it up): click toggles the
+-- window, drag moves it round the minimap edge (ProfessionsDB.mmAngle, degrees)
+local function MinimapButton()
+    if not Minimap or _G.DoudProfessionsMinimapButton then return end
+    local b = CreateFrame("Button", "DoudProfessionsMinimapButton", Minimap)
+    b:SetSize(31, 31); b:SetFrameStrata("MEDIUM"); b:SetFrameLevel(8)
+    b:SetHighlightTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight")
+    local ic = b:CreateTexture(nil, "BACKGROUND")
+    ic:SetSize(20, 20); ic:SetPoint("TOPLEFT", 7, -5); ic:SetTexture(ICON); ic:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+    local bd = b:CreateTexture(nil, "OVERLAY")
+    bd:SetSize(53, 53); bd:SetPoint("TOPLEFT"); bd:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder")
+    local function Place()
+        local a = math.rad(ns.db.mmAngle or 200)
+        local r = (Minimap:GetWidth() or 140) / 2 + 5
+        b:ClearAllPoints(); b:SetPoint("CENTER", Minimap, "CENTER", math.cos(a) * r, math.sin(a) * r)
+    end
+    b:RegisterForDrag("LeftButton")
+    b:SetScript("OnDragStart", function(self)
+        self:SetScript("OnUpdate", function()
+            local mx, my = Minimap:GetCenter()
+            local cx, cy = GetCursorPosition()
+            local sc = Minimap:GetEffectiveScale()
+            ns.db.mmAngle = math.deg(math.atan2(cy / sc - my, cx / sc - mx)); Place()
+        end)
+    end)
+    b:SetScript("OnDragStop", function(self) self:SetScript("OnUpdate", nil) end)
+    b:SetScript("OnClick", function() ns.Toggle() end)
+    b:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_LEFT"); GameTooltip:SetText(TAB_LABEL)
+        GameTooltip:AddLine("Click: open / close. Drag: move.", 1, 1, 1); GameTooltip:Show()
+    end)
+    b:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    Place()
+end
+
 function ns.OnLoad()
     ns.db = FT.InitDB("ProfessionsDB", { chars = {}, sales = {}, vendor = {}, scanned = {}, fav = {}, hidden = {}, deIgnore = {}, deObs = {} })
     AddBlizzardTab()     -- already loaded (another addon opened it first)
+    MinimapButton()
 end
 
 end)
