@@ -1,8 +1,8 @@
 ## Interface: 16001
 ## Title: |cffffd100Doud's Professions|r
-## Notes: Doud's UI Professions module on its own (private, not published): recipe costs and margins, alts, gold, sales, disenchant, vendor, flip. /dprof
+## Notes: Doud's UI Professions module on its own: recipe costs and margins, alts, gold, sales, disenchant, vendor, flip. /dprof
 ## Author: Doudster
-## Version: dev
+## Version: @project-version@
 ## X-License: All Rights Reserved
 ## OptionalDeps: Auctionator
 ## SavedVariables: ProfessionsDB
