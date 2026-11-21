@@ -12,4 +12,6 @@
     <Script file="Flip.lua"/>
     <Script file="Arbitrage.lua"/>
     <Script file="Crates.lua"/>
+    <Script file="Writs.lua"/>
+    <Script file="Cooldowns.lua"/>
 </Ui>

@@ -1,5 +1,5 @@
 -- Professions: a "Professions" tab on Blizzard's profession window (Blizzard_Professions, lazy-loaded) + a minimap button
--- opens a wide window (the full journal's size) with its own tabs, one file each: Recipes, Alts, Wealth, Sales, Item stats, Disenchant, Vendor, Flip, Arbitrage, Crates.
+-- opens a wide window (the full journal's size) with its own tabs, one file each: Recipes, Alts, Wealth, Sales, Item stats, Disenchant, Vendor, Flip, Arbitrage, Crates, Writs, Cooldowns.
 -- Right-click a row of Alts / Wealth / Sales / Item stats / Vendor: delete it (asks first).
 -- Tab files add { name, build = fn(page), shown = fn() (optional: false hides the tab) } to ns.tabs and listen through ns.On;
 -- page.Refresh (if set) runs on show.
@@ -30,6 +30,22 @@ function ns.Char()
     local k = ns.CharKey()
     local c = ns.db.chars[k] or {}
     ns.db.chars[k] = c
+    if not ns.merged then   -- same name on another realm = same character: fold it into this one (this one wins)
+        ns.merged = true
+        local n = k:match("^(.-)%-")
+        for k2, o in pairs(ns.db.chars) do
+            if k2 ~= k and k2:match("^(.-)%-") == n then
+                for f, v in pairs(o) do
+                    local mine = c[f]
+                    if mine == nil then c[f] = v
+                    elseif type(mine) == "table" and type(v) == "table" and mine[1] == nil then
+                        for kk, vv in pairs(v) do if mine[kk] == nil then mine[kk] = vv end end
+                    end
+                end
+                ns.db.chars[k2] = nil
+            end
+        end
+    end
     c.class = select(2, UnitClass("player"))
     return c
 end
