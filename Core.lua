@@ -414,7 +414,7 @@ local function Build()
     local pos = ns.db.pos
     if pos then f:SetPoint(pos[1], UIParent, pos[2], pos[3], pos[4]) else f:SetPoint("CENTER") end
     f:SetFrameStrata("MEDIUM"); f:SetToplevel(true)
-    f:EnableMouse(true); f:SetMovable(true); f:SetClampedToScreen(true)
+    f:EnableMouse(true); f:SetMovable(true); f:SetClampedToScreen(true); f:SetClampRectInsets(-16, 16, 16, -16)   -- 16px edge padding
     f:Hide()
     SyncEscape()
     local title = _G[f:GetName() .. "TitleText"]

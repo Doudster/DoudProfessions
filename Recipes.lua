@@ -164,14 +164,16 @@ local function DiffIcon(d)
     if C_Texture and C_Texture.GetAtlasInfo and C_Texture.GetAtlasInfo(m[1]) then return { atlas = m[1] } end
     return { tex = "Interface\\COMMON\\Indicator-" .. (d == 2 and "Green" or "Yellow"), color = { m[2], m[3], m[4] } }
 end
--- nobody knows the recipe though someone scanned its profession
+-- nobody knows the recipe, and no character has its profession without having scanned it (can't tell then)
 local function Unknown(id, skill)
-    local scanned
+    local name = tostring(ns.Skills[skill]):lower()
     for _, c in pairs(ns.db.chars) do
         if c.known and c.known[id] then return false end
-        if c.scannedSkills and c.scannedSkills[skill] then scanned = true end
+        if not (c.scannedSkills and c.scannedSkills[skill]) then
+            for _, p in ipairs(c.profs or {}) do if tostring(p[1]):lower() == name then return false end end
+        end
     end
-    return scanned or false
+    return true
 end
 local function KnownBy(id)
     local l = {}
